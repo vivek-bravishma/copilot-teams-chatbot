@@ -73,7 +73,7 @@ const bot = new TeamsBot(conversationReferences);
 
 server.post("/api/messages", async (req, res) => {
 	// console.log("get /api/messages==> ", conversationReferences);
-	console.log("post /api/messages=> ", req.body);
+	// console.log("post /api/messages=> ", req.body);
 
 	await adapter.process(req, res, async (context) => {
 		await bot.run(context);
@@ -213,43 +213,84 @@ server.get("/api/user/:conversationId", async (req, res) => {
 });
 
 server.post("/api/msgwebhook", async (req, res) => {
-	let isValid = false;
-
 	const reqBody = req.body;
 	console.log("reqBody=> ", reqBody);
 	const conversationId = reqBody.conversationId;
-	const message = reqBody.message;
+	const message = reqBody.activityData;
 
 	if (conversationReferences[conversationId]) {
 		console.log(`${conversationId} exists.`);
-		isValid = true;
+		let reply = bot.createMessage(message);
 		await adapter.continueConversationAsync(
 			config.botId,
 			conversationReferences[conversationId],
 			async (turnContext) => {
-				await turnContext.sendActivity(message?.text);
+				await turnContext.sendActivity(reply);
 			}
 		);
 	} else {
-		isValid = false;
 		console.log(`${conversationId} does not exist.`);
 	}
 
-	let users = `<li><pre>${JSON.stringify(
+	res.json(200, {
+		reqBody,
 		conversationReferences,
-		undefined,
-		4
-	)}</pre></li>`;
+	});
 
-	res.setHeader("Content-Type", "text/html");
-	res.writeHead(200);
-	res.write(
-		`<html><body><h2>Proactive messages have been sent.</h2>
-		${users}
-		</body></html>`
-		// ${conversationId}
-		// isValid: ${isValid}
-		// ${JSON.stringify(queryParams, null, 4)}
-	);
-	res.end();
+	// let users = `<li><pre>${JSON.stringify(
+	// 	conversationReferences,
+	// 	undefined,
+	// 	4
+	// )}</pre></li>`;
+
+	// res.setHeader("Content-Type", "text/html");
+	// res.writeHead(200);
+	// res.write(
+	// 	`<html><body><h2>Proactive messages have been sent.</h2>
+	// 	${users}
+	// 	</body></html>`
+	// );
+	// res.end();
 });
+
+// server.post("/api/msgwebhook", async (req, res) => {
+// 	let isValid = false;
+
+// 	const reqBody = req.body;
+// 	console.log("reqBody=> ", reqBody);
+// 	const conversationId = reqBody.conversationId;
+// 	const message = reqBody.message;
+
+// 	if (conversationReferences[conversationId]) {
+// 		console.log(`${conversationId} exists.`);
+// 		isValid = true;
+// 		await adapter.continueConversationAsync(
+// 			config.botId,
+// 			conversationReferences[conversationId],
+// 			async (turnContext) => {
+// 				await turnContext.sendActivity(message?.text);
+// 			}
+// 		);
+// 	} else {
+// 		isValid = false;
+// 		console.log(`${conversationId} does not exist.`);
+// 	}
+
+// 	let users = `<li><pre>${JSON.stringify(
+// 		conversationReferences,
+// 		undefined,
+// 		4
+// 	)}</pre></li>`;
+
+// 	res.setHeader("Content-Type", "text/html");
+// 	res.writeHead(200);
+// 	res.write(
+// 		`<html><body><h2>Proactive messages have been sent.</h2>
+// 		${users}
+// 		</body></html>`
+// 		// ${conversationId}
+// 		// isValid: ${isValid}
+// 		// ${JSON.stringify(queryParams, null, 4)}
+// 	);
+// 	res.end();
+// });
