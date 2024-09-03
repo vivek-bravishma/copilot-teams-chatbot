@@ -13,6 +13,8 @@ import { io, Socket } from "socket.io-client";
 import { TeamsBot } from "./teamsBot";
 import config from "./config";
 
+console.log("config=> ", config);
+
 const server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, () => {
 	console.log(`\nBot Started, ${server.name} listening to ${server.url}`);
@@ -214,7 +216,7 @@ server.get("/api/user/:conversationId", async (req, res) => {
 
 server.post("/api/msgwebhook", async (req, res) => {
 	const reqBody = req.body;
-	console.log("reqBody=> ", reqBody);
+	// console.log("reqBody=> ", reqBody);
 	const conversationId = reqBody.conversationId;
 	const message = reqBody.activityData;
 

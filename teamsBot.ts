@@ -133,11 +133,12 @@ export class TeamsBot extends TeamsActivityHandler {
 
 		this.onMembersAdded(async (context, next) => {
 			try {
+				const copilotbotName = "IT_SUPPORT";
 				let connectorResponse = await axios.post(
 					this.connectorInitUrl,
-					context.activity
+					{ contextActivity: context.activity, copilotbotName }
 				);
-				// console.log("connectorResponse==> ", connectorResponse);
+				console.log("connectorResponse==> ", connectorResponse);
 			} catch (error) {
 				console.log("connector error--> ", error);
 			}
